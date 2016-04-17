@@ -108,7 +108,7 @@ Public Class LocalScoposyFile
         'Hardcode to switch name "event_participant" to "event_participants"
         Dim parseNodeName As String = If((node.Name = "event_participant"), "event_participants", node.Name)
         Dim parse_n_xml As Integer = Convert.ToInt32(node.Attributes("n").Value)
-        Dim parse_xmlData As String = "<spocosy version=""1.0"">' + node.OuterXml + '</spocosy>"
+        Dim parse_xmlData As String = "<spocosy version=""1.0"">" + node.OuterXml + "</spocosy>"
 
         Dim parse_event_id As Integer = 0
         Dim parse_outcome_id As Integer = 0
