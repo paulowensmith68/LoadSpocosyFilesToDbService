@@ -1,7 +1,7 @@
 ﻿Imports System.ServiceProcess
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class Service1
+Partial Class LoadSpocosyFilesToDbService
     Inherits System.ServiceProcess.ServiceBase
 
     'UserService overrides dispose to clean up the component list.
@@ -28,7 +28,7 @@ Partial Class Service1
         '
         '   ServicesToRun = New System.ServiceProcess.ServiceBase () {New Service1, New MySecondUserService}
         '
-        ServicesToRun = New System.ServiceProcess.ServiceBase() {New Service1}
+        ServicesToRun = New System.ServiceProcess.ServiceBase() {New LoadSpocosyFilesToDbService}
 
         System.ServiceProcess.ServiceBase.Run(ServicesToRun)
     End Sub
