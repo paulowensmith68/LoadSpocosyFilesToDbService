@@ -230,7 +230,7 @@ Public Class LocalScoposyFile
 
         Try
             'Move the XML file. (if success to "parsed" else to "error")
-            File.Move(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml", My.Settings.LocalDownloadPath + (If((isSuccess), "parsed", "error")) + "\" + Me.id.ToString + ".xml")
+            File.Delete(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml")
         Catch
         End Try
     End Sub
