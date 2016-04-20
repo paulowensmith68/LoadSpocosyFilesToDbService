@@ -93,6 +93,7 @@ Public Class LocalScoposyFile
 
             NodeDatabaseList.Clear()
             insertCount = 0
+
         End If
 
         'Loop through childNodes of current node
@@ -183,6 +184,10 @@ Public Class LocalScoposyFile
 
             Try
 
+                ' Keep count of rows inserted
+                Dim rowsAffected As Integer = 0
+                Dim totalRowsAffected As Integer = 0
+
                 'Ok, this is where the inserts really take place. All the stuff around
                 'is just to prepare for this and handle errors that may occur.
                 For i = 0 To NodeDatabaseList.Count - 1
@@ -192,10 +197,16 @@ Public Class LocalScoposyFile
                     cmd.Parameters("@event_id").Value = NodeDatabaseList(i).event_id
                     cmd.Parameters("@outcome_id").Value = NodeDatabaseList(i).outcome_id
                     cmd.Parameters("@node_n").Value = NodeDatabaseList(i).node_n
-                    cmd.ExecuteNonQuery()
+                    rowsAffected = cmd.ExecuteNonQuery()
+                    totalRowsAffected = totalRowsAffected + rowsAffected
                 Next
+
                 'We are done. Now commit the transaction - actually change the DB.
                 SQLtrans.Commit()
+
+                'Log inserts
+                gobjEvent.WriteToEventLog("LocalScoposyFile:   Rows inserted successfully into bookmaker_xml_nodes: " + totalRowsAffected.ToString)
+
             Catch e1 As System.Exception
                 'If anything went wrong attempt to rollback transaction
                 Try
@@ -233,7 +244,14 @@ Public Class LocalScoposyFile
             'Move the XML file. (if success to "parsed" else to "error")
             File.Delete(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml")
 
-        Catch
+            'Log inserts
+            gobjEvent.WriteToEventLog("LocalScoposyFile:   File processed successfully: " + Me.id.ToString)
+
+        Catch ex As Exception
+
+            'Log inserts
+            gobjEvent.WriteToEventLog("LocalScoposyFile:   Caught error deleting file: " + Me.id.ToString + " Msg: " + ex.Message, EventLogEntryType.Error)
+
         End Try
     End Sub
 
@@ -282,8 +300,9 @@ Public Class LocalScoposyFile
     'Populate lists
     Private Sub populateLists()
         'Only these nodes should be parsed
-        ' Changed removed result  Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,object_participants,lineup,incident,event_incident,event_incident_detail,result,standing,standing_participants,standing_data,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
-        Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,lineup,incident,event_incident,event_incident_detail,standing,standing_participants,standing_data,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
+        ' Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,lineup,incident,event_incident,event_incident_detail,standing,standing_participants,standing_data,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
+        Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type";
+
 
         'Attributes that should always be included
         Me.attribList.Add("ALL", "id,n,ut,del")
