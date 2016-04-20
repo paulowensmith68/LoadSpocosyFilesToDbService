@@ -229,8 +229,10 @@ Public Class LocalScoposyFile
         myConnection.Close()
 
         Try
+
             'Move the XML file. (if success to "parsed" else to "error")
             File.Delete(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml")
+
         Catch
         End Try
     End Sub
