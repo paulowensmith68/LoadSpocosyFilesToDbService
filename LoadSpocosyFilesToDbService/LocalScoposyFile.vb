@@ -23,6 +23,10 @@ Public Class LocalScoposyFile
     Private nodeList As String = ""
     Private attribList As New Dictionary(Of String, String)()
 
+    'List that hold info on which nodes and attributes to use.
+    'These lists are populated in populateLists() function
+    Private oddsProvideList As String = ""
+
     'ID of XML file. This id is generated after push when xml file is saved.
     Public id As Integer = 0
 
@@ -91,9 +95,6 @@ Public Class LocalScoposyFile
         'Parse node if the name is contained in defined nodeList
         If Me.inList(Me.nodeList, node.Name) Then
 
-            'Keep count
-            insertCount += 1
-
             ' Parse node
             parseNode(node)
 
@@ -127,6 +128,10 @@ Public Class LocalScoposyFile
 
         Dim parse_event_id As Integer = 0
         Dim parse_outcome_id As Integer = 0
+        Dim parse_odds_provider_id As Integer = 0
+
+        ' Do we strore boolean
+        Dim blnStore As Boolean = True
 
         ' Extract keys - event
         If parseNodeName = "event" Then
@@ -146,22 +151,48 @@ Public Class LocalScoposyFile
 
         ' bettingoffer
         If parseNodeName = "bettingoffer" Then
+
             If node.Attributes("outcomeFK") IsNot Nothing Then
                 parse_outcome_id = Convert.ToInt32(node.Attributes("outcomeFK").Value)
             End If
+
+            ' check whether we want this Odds Provider
+            If node.Attributes("odds_providerFK") IsNot Nothing Then
+                parse_odds_provider_id = node.Attributes("odds_providerFK").Value
+
+                If Me.inList(Me.oddsProvideList, parse_odds_provider_id) Then
+                    blnStore = True
+                Else
+                    blnStore = False
+                End If
+            Else
+                ' Should be Odds Provider
+                blnStore = False
+            End If
+
         End If
 
-        ' Store in the list array
-        newListItem = New NodeClass() With {
-            .nodeName = parseNodeName,
-            .xmlData = parse_xmlData,
-            .event_id = parse_event_id,
-            .outcome_id = parse_outcome_id,
-            .node_n = parse_n_xml
-    }
 
-        ' Add to list
-        NodeDatabaseList.Add(newListItem)
+        ' Finally store
+        If blnStore Then
+
+            'Keep count
+            insertCount += 1
+
+            ' Store in the list array
+            newListItem = New NodeClass() With {
+                .nodeName = parseNodeName,
+                .xmlData = parse_xmlData,
+                .event_id = parse_event_id,
+                .outcome_id = parse_outcome_id,
+                .node_n = parse_n_xml
+               }
+
+            ' Add to list
+            NodeDatabaseList.Add(newListItem)
+
+        End If
+
     End Sub
 
     'Loops through all nodes in the XML file.
@@ -325,6 +356,9 @@ Public Class LocalScoposyFile
         'Only these nodes should be parsed
         ' Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,lineup,incident,event_incident,event_incident_detail,standing,standing_participants,standing_data,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
         Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
+
+        'Only these Odds Providers should be loaded
+        Me.oddsProvideList = My.Settings.OddsProvdersIdList
 
 
         'Attributes that should always be included

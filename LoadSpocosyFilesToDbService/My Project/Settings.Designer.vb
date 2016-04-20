@@ -148,6 +148,18 @@ Namespace My
                 Me("CommitInsertsEvery") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("3,12,16,23,43,154")>  _
+        Public Property OddsProvdersIdList() As String
+            Get
+                Return CType(Me("OddsProvdersIdList"),String)
+            End Get
+            Set
+                Me("OddsProvdersIdList") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
