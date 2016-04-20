@@ -49,16 +49,26 @@ Public Class LocalScoposyFile
             Return
         End If
         Try
+
             Me.myXml.Load(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml")
-        Catch
+
+        Catch ex As Exception
+
             'Invalid XML Data
+
+            gobjEvent.WriteToEventLog("LocalScoposyFile:   Caught exception loading XML file: " + Me.id.ToString + ".xml" + " Msg:" + ex.Message)
             Return
+
         End Try
     End Sub
 
     'Parse and save the XML Data
     Public Sub parseData()
+
+        gobjEvent.WriteToEventLog("LocalScoposyFile:   Started processing: " + Me.id.ToString + ".xml")
+
         populateLists()
+
         For Each node As XmlNode In Me.myXml.ChildNodes
             nodeLoop(node, 0)
         Next
@@ -77,12 +87,16 @@ Public Class LocalScoposyFile
     'Loops through all nodes in the XML file.
     'This function loops itself to traverse through the XML tree.
     Private Sub nodeLoop(node As XmlNode, lvl As Integer)
-        'Keep count
-        insertCount += 1
 
         'Parse node if the name is contained in defined nodeList
         If Me.inList(Me.nodeList, node.Name) Then
+
+            'Keep count
+            insertCount += 1
+
+            ' Parse node
             parseNode(node)
+
         End If
 
         'Write to database 
@@ -241,11 +255,20 @@ Public Class LocalScoposyFile
 
         Try
 
-            'Move the XML file. (if success to "parsed" else to "error")
-            File.Delete(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml")
+            If isSuccess Then
 
-            'Log inserts
-            gobjEvent.WriteToEventLog("LocalScoposyFile:   File processed successfully: " + Me.id.ToString)
+                'Move the XML file. (if success to "parsed" else to "error")
+                File.Delete(My.Settings.LocalDownloadPath + Me.id.ToString + ".xml")
+
+                ' Called as successfully load
+                gobjEvent.WriteToEventLog("LocalScoposyFile:   Successfully completed processing: " + Me.id.ToString + ".xml")
+
+            Else
+
+                ' Called as unsuccesful load
+                gobjEvent.WriteToEventLog("LocalScoposyFile:   Failed to process file, see messages before: " + Me.id.ToString + ".xml")
+
+            End If
 
         Catch ex As Exception
 
