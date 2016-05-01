@@ -151,7 +151,8 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("3,12,16,23,43,154")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("117,166,444,289,383,270,14,23,286,62,22,93,136,303,100,145,236,392,43,389,194,274"& _ 
+            ",12,7,212,134,422,142,154,428,70,168,108,356,16,354,408,63,141,433")>  _
         Public Property OddsProvdersIdList() As String
             Get
                 Return CType(Me("OddsProvdersIdList"),String)

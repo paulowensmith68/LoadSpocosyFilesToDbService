@@ -23,9 +23,8 @@ Public Class LocalScoposyFile
     Private nodeList As String = ""
     Private attribList As New Dictionary(Of String, String)()
 
-    'List that hold info on which nodes and attributes to use.
     'These lists are populated in populateLists() function
-    Private oddsProvideList As String = ""
+    Public listOddsProvider As New List(Of String)
 
     'ID of XML file. This id is generated after push when xml file is saved.
     Public id As Integer = 0
@@ -160,7 +159,7 @@ Public Class LocalScoposyFile
             If node.Attributes("odds_providerFK") IsNot Nothing Then
                 parse_odds_provider_id = node.Attributes("odds_providerFK").Value
 
-                If Me.inList(Me.oddsProvideList, parse_odds_provider_id) Then
+                If listOddsProvider.Contains(parse_odds_provider_id.ToString) Then
                     blnStore = True
                 Else
                     blnStore = False
@@ -357,8 +356,10 @@ Public Class LocalScoposyFile
         ' Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,lineup,incident,event_incident,event_incident_detail,standing,standing_participants,standing_data,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
         Me.nodeList = "event_participant,country,status_desc,result_type,incident_type,event_incident_type,event_incident_type_text,lineup_type,offence_type,standing_type,standing_type_param,standing_config,language_type,sport,participant,tournament_template,tournament,tournament_stage,event,event_participants,outcome,bettingoffer,property,language,image,reference,reference_type,odds_provider,scope_type,scope_data_type,event_scope,event_scope_detail,scope_result,lineup_scope_result,venue_data,venue_data_type,venue,venue_type"
 
+
         'Only these Odds Providers should be loaded
-        Me.oddsProvideList = My.Settings.OddsProvdersIdList
+        Dim separators() As String = {",", " "}
+        Me.listOddsProvider.AddRange(My.Settings.OddsProvdersIdList.Split(separators, StringSplitOptions.RemoveEmptyEntries))
 
 
         'Attributes that should always be included
@@ -423,6 +424,5 @@ Public Class LocalScoposyFile
     Private Function inList(list As String, checkString As String) As Boolean
         Return (list.StartsWith(checkString) OrElse list.IndexOf(Convert.ToString(",") & checkString) <> -1)
     End Function
-
 
 End Class
